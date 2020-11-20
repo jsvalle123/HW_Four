@@ -16,5 +16,14 @@
     height: 200px;
     margin-top: 40px;
   }
-
+  button {
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+  }
   
+  #btn {
+    height: 15px;
+    width: 15px;
+    
+  }

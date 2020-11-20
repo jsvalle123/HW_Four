@@ -12,13 +12,28 @@
     <a class="navbar-brand" href="#">
       View Highscore
       <a class="navbar float-right" id="timer">Time:</a>
+      <div id="minutes">4</div>
+            <div id="seconds">00</div>
+      <div class="buttons">
+        <a><button aria-label="play" id="play">Start</a>
+          <i class="fa fa-play" aria-hidden="true"></i>
+        </button>
+        <a><button aria-label="pause" id="pause">Pause</a>
+          <i class="fa fa-pause" aria-hidden="true"></i>
+        </button>
+        <a><button aria-label="stop" id="stop">Stop</a>
+          <i class="fa fa-stop" aria-hidden="true"></i>
+        </button>
+      </div>
     </a>
 </nav>
 
 <body>
 <div class="quiz-container">
 <div id="quiz"></div>
-<button id="submit">Get Results</button>
+<div class="card-footer">
+  <button id="submit" class="btn">Get Results!</button>
+</div>
 <div id="results"></div>
 
 

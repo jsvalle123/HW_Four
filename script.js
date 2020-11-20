@@ -1,135 +1,217 @@
+var minutesDisplay = document.querySelector("#minutes");
+var secondsDisplay = document.querySelector("#seconds")
+var timerDisplay = document.querySelector("#timer");
+var playButton = document.querySelector("#play");
+var pauseButton = document.querySelector("#pause");
+var stopButton = document.querySelector("#stop");
+var statusSpan = document.querySelector("#status");
+var statusToggle = document.querySelector("#status-toggle");
 
-var myVar = setInterval(function(){ myTimer() }, 1000);
-var secondlimit = 75;
+var totalSeconds = 0;
+var secondsElapsed = 0;
+var status = "Working";
+var interval;
 
-function myTimer() {
-if(secondlimit == 0)
-{
-    myStopFunction();
+getTimePreferences();
+
+// These two functions are just for making sure the numbers look nice for the html elements
+function getFormattedMinutes() {
+  //
+  var secondsLeft = totalSeconds - secondsElapsed;
+
+  var minutesLeft = Math.floor(secondsLeft / 60);
+
+  var formattedMinutes;
+
+  if (minutesLeft < 2) {
+    formattedMinutes = "0" + minutesLeft;
+  } else {
+    formattedMinutes = minutesLeft;
+  }
+
+  return formattedMinutes;
 }
 
-document.getElementById("timer").innerHTML = '00:' + zeroPad(secondlimit,2);
-secondlimit = secondlimit  - 1;
+function getFormattedSeconds() {
+  var secondsLeft = (totalSeconds - secondsElapsed) % 60;
 
+  var formattedSeconds;
+
+  if (secondsLeft < 10) {
+    formattedSeconds = "0" + secondsLeft;
+  } else {
+    formattedSeconds = secondsLeft;
+  }
+
+  return formattedSeconds;
 }
 
-function myStopFunction() {
-    clearInterval(myVar);
+/* This function retrieves the values from the html input elements; Sort of
+   getting run in the background, it sets the totalSeconds variable which
+   is used in getFormattedMinutes/Seconds() and the renderTime() function.
+   It essentially resets our timer */
+function setTime() {
+  var minutes;
+
+  if (status === "Working") {
+    minutes = minutesDisplay.value.trim();
+  } else {
+    minutes = restMinutesInput.value.trim();
+  }
+
+  clearInterval(interval);
+  totalSeconds = minutes * 60;
 }
 
-function zeroPad(num, places) {
-  var zero = places - num.toString().length + 1;
-  return Array(+(zero > 0 && zero)).join("0") + num;
-}
+// This function does 2 things. displays the time and checks to see if time is up.
+function renderTime() {
+  // When renderTime is called it sets the textContent for the timer html...
+  minutesDisplay.textContent = getFormattedMinutes();
+  secondsDisplay.textContent = getFormattedSeconds();
 
-var myQuestions = [
-    {
-        question: "Where is the correct place to insert a Javascript?",
-        answers:{
-            a: 'Both the <head> section and the <body> section are correct',
-            b: '<body>',
-            c: '<head>',
-            d: '<title>'
-        },
-
-        correctAnswer: 'a'
-        
-    },
-    {
-        question: "Which operator is used to assign a value to a variable?",
-        answers:{
-            a: '*',
-            b: '-',
-            c: '=',
-            d: '+'
-        },
-
-        correctAnswer: 'c'
-        
-    },
-    {
-        question: "What is used to store multiple values in a single variable?",
-        answers:{
-            a: 'object',
-            b: 'string',
-            c: 'arrays',
-            d: 'syntax'
-        },
-
-        correctAnswer: 'c'
-        
+ // ..and then checks to see if the time has run out
+  if (secondsElapsed >= totalSeconds) {
+    if (status === "Working") {
+      alert("Get Results!");
+    } else {
+      alert("Time to get back to work!");
     }
 
+    stopTimer();
+  }
+}
 
-];
+// This function is where the "time" aspect of the timer runs
+// Notice no settings are changed other than to increment the secondsElapsed var
+function startTimer() {
+  setTime();
+
+  // We only want to start the timer if totalSeconds is > 0
+  if (totalSeconds > 0) {
+    /* The "interval" variable here using "setInterval()" begins the recurring increment of the
+       secondsElapsed variable which is used to check if the time is up */
+      interval = setInterval(function() {
+        secondsElapsed++;
+
+        // So renderTime() is called here once every second.
+        renderTime();
+      }, 1000);
+  } else {
+    alert("Minutes of work/rest must be greater than 0.")
+  }
+}
+
+/* This function stops the setInterval() set in startTimer but does not
+   reset the secondsElapsed variable and does not reset the time by calling "setTime()" */
+function pauseTimer() {
+  clearInterval(interval);
+  renderTime();
+}
+
+/* This function stops the interval and also resets secondsElapsed
+   and calls "setTime()" which effectively reset the timer
+   to the input selections workMinutesInput.value and restMinutesInput.value */
+function stopTimer() {
+  secondsElapsed = 0;
+  setTime();
+  renderTime();
+}
+
+/* Our timer is fancy enough to handle 2 different settings at once this toggle
+   function basically just specifies which of our 2 timer settings to use. */
+function toggleStatus(event) {
+  var checked = event.target.checked;
+
+  if (checked) {
+    status = "Working";
+  } else {
+    status = "Resting";
+  }
+
+  statusSpan.textContent = status;
+
+  secondsElapsed = 0;
+  setTime();
+  renderTime();
+}
 
 
 
-function generateQuiz(questions, quizContainer, resultsContainer){
 
-    function showQuestions(questions, quizContainer){
-        var output = [];
-        var answers;
 
-        for(var i=0; i<questions.length; i++){
-            answers = [];
+playButton.addEventListener("click", startTimer);
+pauseButton.addEventListener("click", pauseTimer);
+stopButton.addEventListener("click", stopTimer);
+statusToggle.addEventListener("change", toggleStatus);
 
-            for(letter in questions[i].answers){
 
-                answers.push(
-                    '<label>'
-                     + '<input type="radio" name="questions'+i+'"value="'+letter+'">'
-                     + letter + ': '
-                     + questions[i].answers[letter]
-                     +'</label>'
-                
-                );
-            }
 
-            output.push(
-                '<div class="question">' + questions[i].question + '</div>'
-                + '<div class="answers">' + answers.join('') + '</div>'
-            );
+
+
+function myQuiz(question, answers, correctAnswer) {
+    var myQuestions = [
+        {
+            question1: "Where is the correct place to insert a Javascript?",
+            answers1:{
+                a: 'Both the <head> section and the <body> section are correct',
+                b: '<body>',
+                c: '<head>',
+                d: '<title>'
+            },
+    
+            correctAnswer3: 'a'
+            
+        },
+        {
+            question2: "Which operator is used to assign a value to a variable?",
+            answers2:{
+                a: '*',
+                b: '-',
+                c: '=',
+                d: '+'
+            },
+    
+            correctAnswer3: 'c'
+            
+        },
+        {
+            question3: "What is used to store multiple values in a single variable?",
+            answers3:{
+                a: 'object',
+                b: 'string',
+                c: 'arrays',
+                d: 'syntax'
+            },
+    
+            correctAnswer3: 'c'
+            
         }
-        quizContainer.innerHTML = output.join('');
+    
+    
+    ];
+    for (var i = 0; i < myQuestions.length; i++) {
+        
+        console.log(myQuestions[i]);
+      }
 
-    }
+    var quiz = document.querySelector("#quiz");
+    quiz.textContent.innerHTML = myQuestions;
+    console.log(myQuestions);
 
-    function showResults(questions, quizContainer, resultsContainer){
 
-        var answerContainers = quizContainer.querySelectorAll('.answers');
-
-        var userAnswer = '';
-        var numCorrect = 0;
-
-        for(var i=0; i<questions.length; i++){
-
-            userAnswer = (answerContainers[i].querySelector('input[name=question'+i+']:checked')||{}).value;
-
-            if(userAnswer===questions[i].correctAnswer){
-
-                numCorrect++;
-
-                answerContainers[i].style.colo = 'green';
-            }
-            else{
-
-                answeContainers[i].style.color= 'red';
-            }
-        }
-        resultsContainer.innerHTML = numCorrect + ' out of ' + questions.length;
-
-    }
-
-    showQuestions(questions, quizContainer);
-
-    submitButton.onclick= function(){
-        showResults(questions, quizContainer, resultsContainer);
-    }
+    
+     
 }
 
-var quizContainer = document.getElementById('quiz');
-var resultsContainer = document.getElementById('results');
-var submitButton = document.getElementById('submit');
+myQuiz();
+
+    
+localStorage.setItem("answers", JSON.stringify(answers));
+var lastanswers = JSON.parse(localStorage.getItem("answers"));
+    
+      
+
+var resultsContainer = document.querySelector("#results");
+var submitButton = document.querySelector("#submit");
 
 
