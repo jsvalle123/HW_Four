@@ -8,33 +8,42 @@
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
+<body>
 <nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="#">
-      View Highscore
-      <a class="navbar float-right" id="timer">Time:</a>
+    <a class="navbar-brand" href="#">Code Quiz</a>
+      <a class="highScore float-right" id="highscore">High Score:</a>
+      <a class="timer float-right" id="timer">Time:</a>
       <div id="minutes">4</div>
             <div id="seconds">00</div>
-      <div class="buttons">
-        <a><button aria-label="play" id="play">Start</a>
+      <div>
+        <a><button class="btn" aria-label="play" id="play">Start</a>
           <i class="fa fa-play" aria-hidden="true"></i>
         </button>
-        <a><button aria-label="pause" id="pause">Pause</a>
+        <a><button class="btn" aria-label="pause" id="pause">Pause</a>
           <i class="fa fa-pause" aria-hidden="true"></i>
         </button>
-        <a><button aria-label="stop" id="stop">Stop</a>
+        <a><button class="btn" aria-label="stop" id="stop">Stop</a>
           <i class="fa fa-stop" aria-hidden="true"></i>
         </button>
       </div>
     </a>
 </nav>
 
-<body>
-<div class="quiz-container">
-<div id="quiz"></div>
+<div class="container">
+  <div id="start" class="flex">
+    <h1 class="text-center">Code Quiz</h1>
+    <p>Answer the following questions in the time given. Good luck!</p>
+    <button id ="begin" type="btn" class="startButton mb-5">Begin Quiz</button>
+  </div>
+</div>
+
+</div>
+<div class="quiz-container"></div>
+<div id="quiz" class="hide"></div>
 <div class="card-footer">
   <button id="submit" class="btn">Get Results!</button>
 </div>
-<div id="results"></div>
+<div class="resultsContainer" id="results"></div>
 
 
     

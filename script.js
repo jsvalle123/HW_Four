@@ -6,13 +6,23 @@ var pauseButton = document.querySelector("#pause");
 var stopButton = document.querySelector("#stop");
 var statusSpan = document.querySelector("#status");
 var statusToggle = document.querySelector("#status-toggle");
+var quizContainer = document.getElementById("quiz");
+var resultsContainer = document.getElementById("results");
+var body = document.getElementById("body");
+// var button = querySelectorAll("button");
+var questionId = 0;
+var startButton = document.getElementById("begin");
+startButton.addEventListener('click', beginQuiz);
+// button.className = "btn btn-primary";
+var highScore = document.getElementById("highscore");
+highScore.addEventListener('click', showHighscore);
+var questionId = 0;
+
 
 var totalSeconds = 0;
 var secondsElapsed = 0;
 var status = "Working";
 var interval;
-
-getTimePreferences();
 
 // These two functions are just for making sure the numbers look nice for the html elements
 function getFormattedMinutes() {
@@ -33,7 +43,7 @@ function getFormattedMinutes() {
 }
 
 function getFormattedSeconds() {
-  var secondsLeft = (totalSeconds - secondsElapsed) % 60;
+  var secondsLeft = (totalSeconds - secondsElapsed);
 
   var formattedSeconds;
 
@@ -52,11 +62,13 @@ function getFormattedSeconds() {
    It essentially resets our timer */
 function setTime() {
   var minutes;
+  var minutesDisplay = 2;
+  var restMinutesInput= 2;
 
   if (status === "Working") {
-    minutes = minutesDisplay.value.trim();
+    minutes = minutesDisplay
   } else {
-    minutes = restMinutesInput.value.trim();
+    minutes = restMinutesInput
   }
 
   clearInterval(interval);
@@ -84,7 +96,7 @@ function renderTime() {
 // This function is where the "time" aspect of the timer runs
 // Notice no settings are changed other than to increment the secondsElapsed var
 function startTimer() {
-  setTime();
+  
 
   // We only want to start the timer if totalSeconds is > 0
   if (totalSeconds > 0) {
@@ -99,6 +111,7 @@ function startTimer() {
   } else {
     alert("Minutes of work/rest must be greater than 0.")
   }
+  setTime();
 }
 
 /* This function stops the setInterval() set in startTimer but does not
@@ -142,76 +155,158 @@ function toggleStatus(event) {
 playButton.addEventListener("click", startTimer);
 pauseButton.addEventListener("click", pauseTimer);
 stopButton.addEventListener("click", stopTimer);
-statusToggle.addEventListener("change", toggleStatus);
+// statusToggle.addEventListener("change", toggleStatus);
 
 
 
 
+let currentQuestionId = 0
 
-function myQuiz(question, answers, correctAnswer) {
-    var myQuestions = [
+    let myQuestions = [
         {
-            question1: "Where is the correct place to insert a Javascript?",
-            answers1:{
+            question: "Where is the correct place to insert a Javascript?",
+            answers:{
                 a: 'Both the <head> section and the <body> section are correct',
                 b: '<body>',
                 c: '<head>',
                 d: '<title>'
             },
     
-            correctAnswer3: 'a'
+            correctAnswer: 'a'
             
         },
         {
-            question2: "Which operator is used to assign a value to a variable?",
-            answers2:{
+            question: "Which operator is used to assign a value to a variable?",
+            answers:{
                 a: '*',
                 b: '-',
                 c: '=',
                 d: '+'
             },
     
-            correctAnswer3: 'c'
+            correctAnswer: 'c'
             
         },
         {
-            question3: "What is used to store multiple values in a single variable?",
-            answers3:{
+            question: "What is used to store multiple values in a single variable?",
+            answers:{
                 a: 'object',
                 b: 'string',
                 c: 'arrays',
                 d: 'syntax'
             },
     
-            correctAnswer3: 'c'
+            correctAnswer: 'c'
             
         }
     
     
     ];
-    for (var i = 0; i < myQuestions.length; i++) {
-        
-        console.log(myQuestions[i]);
-      }
-
-    var quiz = document.querySelector("#quiz");
-    quiz.textContent.innerHTML = myQuestions;
-    console.log(myQuestions);
-
-
     
-     
-}
+    function beginQuiz() {
+      var start = document.getElementById('start');
+      var quiz = document.getElementById('quiz');
 
-myQuiz();
+      start.className = "flex";
+      quiz.className = "hide";
 
-    
-localStorage.setItem("answers", JSON.stringify(answers));
-var lastanswers = JSON.parse(localStorage.getItem("answers"));
-    
+   
+    }
+    showQuestion();
+    beginQuiz();
+    setTime();
+
+    function showQuestion() {
+      var currentQuestion = myQuestions[questionId];
+      var question = document.createElement("div");
+      question.className += ("question");
+
+      var answerA = document.createElement("button");
+      answerA.className += "btn btn-primary";
+      answerA.addEventListener('click', () => checkAnswer(currentQuestion.answers.a));
+
+      var answerB = document.createElement("button");
+      answerB.className += "btn btn-primary";
+      answerB.addEventListener('click', () => checkAnswer(currentQuestion.answers.c));
       
+      var answerC = document.createElement("button");
+      answerC.className += "btn btn-primary";
+      answerC.addEventListener('click', () => checkAnswer(currentQuestion.answers.c));
 
-var resultsContainer = document.querySelector("#results");
-var submitButton = document.querySelector("#submit");
+      question.textContent = currentQuestion.question;
+      answerA.textContent = currentQuestion.answers.a;
+      answerB.textContent = currentQuestion.answers.c;
+      answerC.textContent = currentQuestion.answers.c;
+      quizContainer.appendChild(question);
+      quizContainer.appendChild(answerA);
+      quizContainer.appendChild(answerB);
+      quizContainer.appendChild(answerC);
+      
+    }
+
+    function checkAnswer(answer) {
+      let correctLetter = myQuestions[questionId].correctAnswer;
+      if (myQuestions[questionId].answers[correctLetter] === answer) {
+        alert("That's Right!");
+      }
+      else {
+        alert("That's Wrong :(");
+      }
+      questionId++;
+      quizContainer.innerHTML = "";
+      if (questionId === myQuestions.length) {
+        return endQuiz();
+      }
+      showQuestion();
+    }
+    
+  function endQuiz() {
+    console.log("quiz done");
+ }
+    addtoHighScore();
+    showHighscore();
 
 
+  function addtoHighScore() {
+    var name = prompt("What is your name?")
+    var correctAnswer = myQuestions[questionId].correctAnswer
+    var finalScore = correctAnswer
+
+
+    var thisScore = {
+      name: name,
+      score: finalScore
+    };
+
+    var scores = JSON.parse(localStorage.getItem("scores"));
+    if (!scores) {
+      scores = new Array();
+    }
+    scores.push(thisScore);
+    localStorage.setItem("scores", JSON.stringify(scores));
+  }
+
+  function showHighscore() {
+    var scores = JSON.parse(localStorage.getItem("scores"));
+
+    var scoreData = document.createElement("ul");
+    for (const s in scores) {
+      var score = scores[s];
+      var content = `${score.name} in ${score.finalScore}`;
+
+      var li = document.createElement("li");
+      scoreData.appendChild(li);
+      li.innerHTML = content;
+    }
+
+    if (resultsContainer.hasChildNodes() === true) {
+      resultsContainer.replaceChild(scoreData, resultsContainer.childNodes[0])
+    } else {
+      resultsContainer.appendChild(scoreData);
+
+    }
+  }
+
+
+
+    
